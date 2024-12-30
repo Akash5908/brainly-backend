@@ -3,6 +3,7 @@ import express, { Request, Response } from "express";
 import mongoose from "mongoose";
 
 import { routes as userRoutes } from "./routes/users";
+import { routes as contentRoutes } from "./routes/content";
 
 require("dotenv").config();
 
@@ -18,7 +19,11 @@ const app = express();
 
 app.use(express.json());
 
+// user api
 app.use("/user", userRoutes);
+
+// content api
+app.use("/content", contentRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Main Root");

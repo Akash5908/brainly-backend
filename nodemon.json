@@ -1,0 +1,4 @@
+{
+  "ext": "*.ts",
+  "exec": "tsc && ts-node ./src/index.ts"
+}

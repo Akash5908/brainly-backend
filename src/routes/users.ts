@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import jwt from "jsonwebtoken";
 
-import { User } from "../database";
+import { Users } from "../database";
 
 export const routes = Router();
 
@@ -20,9 +20,8 @@ const userSchema = z.object({
 routes.post("/signup", async (req: Request, res: Response) => {
   try {
     const result = userSchema.parse(req.body);
-    console.log("Result", result);
 
-    await User.create({
+    await Users.create({
       username: result.username,
       password: result.password,
     });
@@ -41,7 +40,7 @@ routes.post("/signup", async (req: Request, res: Response) => {
 routes.get("/login", async (req: Request, res: Response) => {
   try {
     const loginData = userSchema.parse(req.body);
-    const userCheck = await User.findOne({ username: loginData.username });
+    const userCheck = await Users.findOne({ username: loginData.username });
 
     if (userCheck) {
       const passwordCheck =
