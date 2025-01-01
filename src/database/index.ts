@@ -37,7 +37,13 @@ const LinkSchema = new Schema({
   userId: { type: mongoose.Types.ObjectId, ref: "users" },
 });
 
+const CardLinkSchema = new Schema({
+  token: String,
+  userId: { type: mongoose.Types.ObjectId, ref: "users" },
+});
+
 export const Users = mongoose.model("users", UserSchema);
 export const Tags = mongoose.model("tags", TagsSchema);
 export const Contents = mongoose.model("contents", ContentSchema);
 export const Links = mongoose.model("links", LinkSchema);
+export const CardLink = mongoose.model("cardLinks", CardLinkSchema);

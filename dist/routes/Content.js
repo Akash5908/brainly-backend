@@ -8,10 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.routes = void 0;
 const express_1 = require("express");
 const database_1 = require("../database");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const database_2 = require("../database");
 exports.routes = (0, express_1.Router)();
 // Create the Content
 exports.routes.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -75,6 +80,54 @@ exports.routes.delete("/", (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
     catch (error) {
         res.status(500).json({
+            error: error,
+        });
+    }
+}));
+//Share Link
+function generateToken(id) {
+    const token = jsonwebtoken_1.default.sign({ id }, "Secret", { expiresIn: "1h" });
+    return token;
+}
+//Adding the token of the shared Card and send the url for the share
+exports.routes.get("/share", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const cardToken = yield generateToken(req.body.id);
+    const sharedLink = `http://localhost:3000/content/share/${cardToken}`;
+    yield database_2.CardLink.create({
+        token: cardToken,
+        userId: req.body.userId,
+    });
+    res.status(200).json({
+        message: sharedLink,
+    });
+}));
+// Get the card info by the shared Link
+exports.routes.get("/share/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    try {
+        const contentId = jsonwebtoken_1.default.verify(id, "Secret");
+        if (contentId) {
+            const Content = yield database_1.Contents.findById({ _id: contentId });
+            if (Content) {
+                res.status(200).json({
+                    content: Content,
+                });
+            }
+            else {
+                res.status(403).json({
+                    message: `Content not found`,
+                });
+            }
+        }
+        else {
+            res.status(403).json({
+                message: `Invalid Link`,
+            });
+        }
+    }
+    catch (error) {
+        res.status(500).json({
+            messae: "Somthing went wrong",
             error: error,
         });
     }

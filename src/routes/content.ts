@@ -1,6 +1,9 @@
 import { Router, Request, Response } from "express";
 
 import { Contents } from "../database";
+import jwt from "jsonwebtoken";
+
+import { CardLink } from "../database";
 
 export const routes = Router();
 
@@ -66,6 +69,59 @@ routes.delete("/", async (req: Request, res: Response) => {
     }
   } catch (error) {
     res.status(500).json({
+      error: error,
+    });
+  }
+});
+
+//Share Link
+
+function generateToken(id: string) {
+  const token = jwt.sign({ id }, "Secret", { expiresIn: "1h" });
+  return token;
+}
+//Adding the token of the shared Card and send the url for the share
+routes.get("/share", async (req: Request, res: Response) => {
+  const cardToken = await generateToken(req.body.id);
+
+  const sharedLink = `http://localhost:3000/content/share/${cardToken}`;
+
+  await CardLink.create({
+    token: cardToken,
+    userId: req.body.userId,
+  });
+
+  res.status(200).json({
+    message: sharedLink,
+  });
+});
+
+// Get the card info by the shared Link
+routes.get("/share/:id", async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  try {
+    const contentId = jwt.verify(id, "Secret");
+    if (contentId) {
+      const Content = await Contents.findById({ _id: contentId });
+
+      if (Content) {
+        res.status(200).json({
+          content: Content,
+        });
+      } else {
+        res.status(403).json({
+          message: `Content not found`,
+        });
+      }
+    } else {
+      res.status(403).json({
+        message: `Invalid Link`,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      messae: "Somthing went wrong",
       error: error,
     });
   }
