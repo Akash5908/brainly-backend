@@ -17,9 +17,10 @@ const express_1 = require("express");
 const database_1 = require("../database");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const database_2 = require("../database");
+const user_1 = require("../middleware/user");
 exports.routes = (0, express_1.Router)();
 // Create the Content
-exports.routes.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.routes.post("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { type, link, title, tags, userId } = req.body;
     try {
         yield database_1.Contents.create({
@@ -40,7 +41,7 @@ exports.routes.post("/", (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 }));
 // Get the Content
-exports.routes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.routes.get("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId } = req.body;
     try {
         const contentCheck = yield database_1.Contents.find({ userId });
@@ -62,7 +63,7 @@ exports.routes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 }));
 // Delete the Content
-exports.routes.delete("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.routes.delete("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { contentId } = req.body;
     try {
         const contentCheck = yield database_1.Contents.find({ contentId });
@@ -102,7 +103,7 @@ exports.routes.get("/share", (req, res) => __awaiter(void 0, void 0, void 0, fun
     });
 }));
 // Get the card info by the shared Link
-exports.routes.get("/share/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.routes.get("/share/:id", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     try {
         const contentId = jsonwebtoken_1.default.verify(id, "Secret");
