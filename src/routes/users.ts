@@ -37,23 +37,17 @@ routes.post("/signup", async (req: Request, res: Response) => {
 });
 
 //login Route
-routes.get("/login", async (req: Request, res: Response) => {
+routes.post("/login", async (req: Request, res: Response) => {
   try {
     const loginData = userSchema.parse(req.body);
     const userCheck = await Users.findOne({ username: loginData.username });
 
     if (userCheck) {
-      const passwordCheck =
-        loginData.password == userCheck.password
-          ? true
-          : res.status(403).json({
-              error: "Password Incorrect",
-            });
-
       if (loginData.password == userCheck.password) {
         const token = jwt.sign(loginData.username, "ahiahadojhajokhdlh");
         res.send({
           token: token,
+          name: userCheck.username,
         });
       } else {
         res.status(403).json({

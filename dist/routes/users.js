@@ -46,20 +46,16 @@ exports.routes.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, f
     }
 }));
 //login Route
-exports.routes.get("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.routes.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const loginData = userSchema.parse(req.body);
         const userCheck = yield database_1.Users.findOne({ username: loginData.username });
         if (userCheck) {
-            const passwordCheck = loginData.password == userCheck.password
-                ? true
-                : res.status(403).json({
-                    error: "Password Incorrect",
-                });
             if (loginData.password == userCheck.password) {
                 const token = jsonwebtoken_1.default.sign(loginData.username, "ahiahadojhajokhdlh");
                 res.send({
                     token: token,
+                    name: userCheck.username,
                 });
             }
             else {
