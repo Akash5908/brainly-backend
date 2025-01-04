@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 
 import { Users } from "../database";
 
+
 export const routes = Router();
 
 const userSchema = z.object({

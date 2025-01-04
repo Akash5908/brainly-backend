@@ -4,11 +4,12 @@ import { Contents } from "../database";
 import jwt from "jsonwebtoken";
 
 import { CardLink } from "../database";
+import { userStatus } from "../middleware/user";
 
 export const routes = Router();
 
 // Create the Content
-routes.post("/", async (req: Request, res: Response) => {
+routes.post("/", userStatus, async (req: Request, res: Response) => {
   const { type, link, title, tags, userId } = req.body;
 
   try {
@@ -31,7 +32,7 @@ routes.post("/", async (req: Request, res: Response) => {
 
 // Get the Content
 
-routes.get("/", async (req: Request, res: Response) => {
+routes.get("/", userStatus, async (req: Request, res: Response) => {
   const { userId } = req.body;
   try {
     const contentCheck = await Contents.find({ userId });
@@ -53,7 +54,7 @@ routes.get("/", async (req: Request, res: Response) => {
 
 // Delete the Content
 
-routes.delete("/", async (req: Request, res: Response) => {
+routes.delete("/", userStatus, async (req: Request, res: Response) => {
   const { contentId } = req.body;
   try {
     const contentCheck = await Contents.find({ contentId });
@@ -97,7 +98,7 @@ routes.get("/share", async (req: Request, res: Response) => {
 });
 
 // Get the card info by the shared Link
-routes.get("/share/:id", async (req: Request, res: Response) => {
+routes.get("/share/:id", userStatus, async (req: Request, res: Response) => {
   const id = req.params.id;
 
   try {
