@@ -16,6 +16,7 @@ const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const users_1 = require("./routes/users");
 const content_1 = require("./routes/content");
+const cors_1 = __importDefault(require("cors"));
 require("dotenv").config();
 try {
     (() => __awaiter(void 0, void 0, void 0, function* () {
@@ -26,8 +27,12 @@ try {
 catch (error) {
     console.log("Problem in connecting the database");
 }
+// let corsOptions = {
+//    "http://localhost:3000",
+// };
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+app.use((0, cors_1.default)());
 // user api
 app.use("/user", users_1.routes);
 // content api

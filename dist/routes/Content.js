@@ -22,6 +22,7 @@ exports.routes = (0, express_1.Router)();
 // Create the Content
 exports.routes.post("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { type, link, title, tags, userId } = req.body;
+    console.log("inside the cocreaate cointent");
     try {
         yield database_1.Contents.create({
             type,
@@ -41,11 +42,13 @@ exports.routes.post("/", user_1.userStatus, (req, res) => __awaiter(void 0, void
     }
 }));
 // Get the Content
-exports.routes.get("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId } = req.body;
+exports.routes.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.query.id;
+    console.log("User id ", userId);
     try {
         const contentCheck = yield database_1.Contents.find({ userId });
-        if (contentCheck) {
+        console.log("CONTENT CHECK", contentCheck);
+        if (contentCheck.length > 0) {
             res.status(200).json({
                 content: contentCheck,
             });

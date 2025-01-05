@@ -26,8 +26,8 @@ const TagsSchema = new Schema({
 
 const ContentSchema = new Schema({
   link: String,
-  type: { type: String, enum: contenTypes, required: true },
-  title: { type: String, required: true },
+  type: { type: String, enum: contenTypes, required: true, default: "youtube" },
+  title: { type: String, required: true, default: "Untitled" },
   tags: [{ type: mongoose.Types.ObjectId, ref: "tags" }],
   userId: { type: mongoose.Types.ObjectId, ref: "users", required: true },
 });

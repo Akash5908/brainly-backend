@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 
 import { routes as userRoutes } from "./routes/users";
 import { routes as contentRoutes } from "./routes/content";
+import cors from "cors";
 
 require("dotenv").config();
 
@@ -15,10 +16,15 @@ try {
 } catch (error) {
   console.log("Problem in connecting the database");
 }
+
+// let corsOptions = {
+//    "http://localhost:3000",
+// };
+
 const app = express();
 
 app.use(express.json());
-
+app.use(cors());
 // user api
 app.use("/user", userRoutes);
 
