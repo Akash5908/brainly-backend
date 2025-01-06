@@ -27,7 +27,11 @@ const TagsSchema = new Schema({
 const ContentSchema = new Schema({
   link: String,
   type: { type: String, enum: contenTypes, required: true, default: "youtube" },
-  title: { type: String, required: true, default: "Untitled" },
+  title: { type: String, required: true, default: "Title Test" },
+  describtion: {
+    type: String,
+    default: "Invalid DOM property `stroke-width`. Did you mean `strokeWidth`?",
+  },
   tags: [{ type: mongoose.Types.ObjectId, ref: "tags" }],
   userId: { type: mongoose.Types.ObjectId, ref: "users", required: true },
 });

@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 
 import { Users } from "../database";
 
-
 export const routes = Router();
 
 const userSchema = z.object({
@@ -49,6 +48,7 @@ routes.post("/login", async (req: Request, res: Response) => {
         res.send({
           token: token,
           name: userCheck.username,
+          id: userCheck._id,
         });
       } else {
         res.status(403).json({

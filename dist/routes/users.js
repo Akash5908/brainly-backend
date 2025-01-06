@@ -56,6 +56,7 @@ exports.routes.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, fu
                 res.send({
                     token: token,
                     name: userCheck.username,
+                    id: userCheck._id,
                 });
             }
             else {

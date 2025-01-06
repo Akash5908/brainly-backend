@@ -11,7 +11,7 @@ export const routes = Router();
 // Create the Content
 routes.post("/", userStatus, async (req: Request, res: Response) => {
   const { type, link, title, tags, userId } = req.body;
-  console.log("inside the cocreaate cointent");
+
   try {
     await Contents.create({
       type,
@@ -32,12 +32,12 @@ routes.post("/", userStatus, async (req: Request, res: Response) => {
 
 // Get the Content
 
-routes.get("/", async (req: Request, res: Response) => {
+routes.get("/", userStatus, async (req: Request, res: Response) => {
   const userId = req.query.id as string;
-  console.log("User id ", userId);
+
   try {
     const contentCheck = await Contents.find({ userId });
-    console.log("CONTENT CHECK", contentCheck);
+
     if (contentCheck.length > 0) {
       res.status(200).json({
         content: contentCheck,
