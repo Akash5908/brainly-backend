@@ -27,10 +27,7 @@ try {
 catch (error) {
     console.log("Problem in connecting the database");
 }
-// let corsOptions = {
-//    "http://localhost:3000",
-// };
-const app = (0, express_1.default)();
+adddconst app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 // user api

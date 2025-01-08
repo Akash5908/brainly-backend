@@ -64,11 +64,12 @@ exports.routes.get("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 
 }));
 // Delete the Content
 exports.routes.delete("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { contentId } = req.body;
+d the co    const id = req.body.id;
+    console.log("Id insde the delete", id);
     try {
-        const contentCheck = yield database_1.Contents.find({ contentId });
+        const contentCheck = yield database_1.Contents.find({ id });
         if (contentCheck) {
-            yield database_1.Contents.deleteOne({ _id: contentId });
+            yield database_1.Contents.deleteOne({ _id: id });
             res.status(200).json({
                 message: "Content Deleted",
             });

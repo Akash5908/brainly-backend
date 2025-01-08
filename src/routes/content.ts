@@ -57,11 +57,12 @@ routes.get("/", userStatus, async (req: Request, res: Response) => {
 // Delete the Content
 
 routes.delete("/", userStatus, async (req: Request, res: Response) => {
-  const { contentId } = req.body;
+  const id = req.body.id;
+  console.log("Id insde the delete", id);
   try {
-    const contentCheck = await Contents.find({ contentId });
+    const contentCheck = await Contents.find({ id });
     if (contentCheck) {
-      await Contents.deleteOne({ _id: contentId });
+      await Contents.deleteOne({ _id: id });
       res.status(200).json({
         message: "Content Deleted",
       });

@@ -16,11 +16,7 @@ try {
 } catch (error) {
   console.log("Problem in connecting the database");
 }
-
-// let corsOptions = {
-//    "http://localhost:3000",
-// };
-
+nte;
 const app = express();
 
 app.use(express.json());
