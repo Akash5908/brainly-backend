@@ -30,9 +30,9 @@ const ContentSchema = new Schema({
     title: { type: String, required: true, default: "Title Test" },
     describtion: {
         type: String,
-        default: "Invalid DOM property `stroke-width`. Did you mean `strokeWidth`?",
     },
-    tags: [{ type: mongoose_1.default.Types.ObjectId, ref: "tags" }],
+    // tags: [{ type: mongoose.Types.ObjectId, ref: "tags" }],
+    tags: [String],
     userId: { type: mongoose_1.default.Types.ObjectId, ref: "users", required: true },
 });
 const LinkSchema = new Schema({

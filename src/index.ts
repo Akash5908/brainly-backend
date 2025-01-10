@@ -16,11 +16,16 @@ try {
 } catch (error) {
   console.log("Problem in connecting the database");
 }
-nte;
+
 const app = express();
 
+const corsOptions = {
+  origin: "http://localhost:3000",
+  oriinSuccessStatus: 200,
+};
+
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 // user api
 app.use("/user", userRoutes);
 

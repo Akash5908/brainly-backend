@@ -21,12 +21,15 @@ const user_1 = require("../middleware/user");
 exports.routes = (0, express_1.Router)();
 // Create the Content
 exports.routes.post("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { type, link, title, tags, userId } = req.body;
+    console.log("REQUEST BODY ADD CONTENT", req.body);
+    const { type, link, title, describtion, tags } = req.body.Carddata;
+    const { userId } = req.body;
     try {
         yield database_1.Contents.create({
             type,
             link,
             title,
+            describtion,
             tags,
             userId,
         });
@@ -64,7 +67,7 @@ exports.routes.get("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 
 }));
 // Delete the Content
 exports.routes.delete("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-d the co    const id = req.body.id;
+    const id = req.body.id;
     console.log("Id insde the delete", id);
     try {
         const contentCheck = yield database_1.Contents.find({ id });

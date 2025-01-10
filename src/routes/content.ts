@@ -10,13 +10,15 @@ export const routes = Router();
 
 // Create the Content
 routes.post("/", userStatus, async (req: Request, res: Response) => {
-  const { type, link, title, tags, userId } = req.body;
-
+  console.log("REQUEST BODY ADD CONTENT", req.body);
+  const { type, link, title, describtion, tags } = req.body.Carddata;
+  const { userId } = req.body;
   try {
     await Contents.create({
       type,
       link,
       title,
+      describtion,
       tags,
       userId,
     });
