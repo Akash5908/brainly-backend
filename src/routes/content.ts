@@ -60,27 +60,35 @@ routes.get("/", userStatus, async (req: Request, res: Response) => {
 
 routes.put("/", userStatus, async (req: Request, res: Response) => {
   const id = req.query.id;
-  const cardData = req.body;
+
+  const { type, link, title, describtion, tags } = req.body.CardData;
+
+  if (!type || !link || !title || !describtion || !tags) {
+    res.status(400).json({ message: "Invalid payload" });
+  }
+
   try {
-    const card = await Contents.findById(id);
-    if (!card) {
-      res.status(400).json({
-        message: "card not found",
-      });
+    const updatedCard = await Contents.findByIdAndUpdate(
+      id,
+      { type, link, title, describtion, tags },
+      { new: true }
+    );
+
+    if (!updatedCard) {
+      res.status(404).json({ message: "Card not found" });
+      return;
     }
-    const updateContent = await Contents.findByIdAndUpdate(id, cardData);
-    res.status(200).json(updateContent);
+
+    res.status(200).json(updatedCard);
   } catch (error) {
-    res.status(500).json({
-      error: "Something Went Wrong",
-    });
+    res.status(500).json({ message: "Error updating the card", error });
   }
 });
 
 // Delete the Content
 
 routes.delete("/", userStatus, async (req: Request, res: Response) => {
-  const id = req.body.id;
+  const id = req.query.id;
   console.log("Id insde the delete", id);
   try {
     const contentCheck = await Contents.find({ id });

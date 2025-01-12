@@ -68,26 +68,25 @@ exports.routes.get("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 
 // Update the Content
 exports.routes.put("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.query.id;
-    const cardData = req.body;
+    const { type, link, title, describtion, tags } = req.body.CardData;
+    if (!type || !link || !title || !describtion || !tags) {
+        res.status(400).json({ message: "Invalid payload" });
+    }
     try {
-        const card = yield database_1.Contents.findById(id);
-        if (!card) {
-            res.status(400).json({
-                message: "card not found",
-            });
+        const updatedCard = yield database_1.Contents.findByIdAndUpdate(id, { type, link, title, describtion, tags }, { new: true });
+        if (!updatedCard) {
+            res.status(404).json({ message: "Card not found" });
+            return;
         }
-        const updateContent = yield database_1.Contents.findByIdAndUpdate(id, cardData);
-        res.status(200).json(updateContent);
+        res.status(200).json(updatedCard);
     }
     catch (error) {
-        res.status(500).json({
-            error: "Something Went Wrong",
-        });
+        res.status(500).json({ message: "Error updating the card", error });
     }
 }));
 // Delete the Content
 exports.routes.delete("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.body.id;
+    const id = req.query.id;
     console.log("Id insde the delete", id);
     try {
         const contentCheck = yield database_1.Contents.find({ id });
