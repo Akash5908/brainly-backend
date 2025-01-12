@@ -65,6 +65,26 @@ exports.routes.get("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 
         });
     }
 }));
+// Update the Content
+exports.routes.put("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.query.id;
+    const cardData = req.body;
+    try {
+        const card = yield database_1.Contents.findById(id);
+        if (!card) {
+            res.status(400).json({
+                message: "card not found",
+            });
+        }
+        const updateContent = yield database_1.Contents.findByIdAndUpdate(id, cardData);
+        res.status(200).json(updateContent);
+    }
+    catch (error) {
+        res.status(500).json({
+            error: "Something Went Wrong",
+        });
+    }
+}));
 // Delete the Content
 exports.routes.delete("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.body.id;

@@ -56,6 +56,27 @@ routes.get("/", userStatus, async (req: Request, res: Response) => {
   }
 });
 
+// Update the Content
+
+routes.put("/", userStatus, async (req: Request, res: Response) => {
+  const id = req.query.id;
+  const cardData = req.body;
+  try {
+    const card = await Contents.findById(id);
+    if (!card) {
+      res.status(400).json({
+        message: "card not found",
+      });
+    }
+    const updateContent = await Contents.findByIdAndUpdate(id, cardData);
+    res.status(200).json(updateContent);
+  } catch (error) {
+    res.status(500).json({
+      error: "Something Went Wrong",
+    });
+  }
+});
+
 // Delete the Content
 
 routes.delete("/", userStatus, async (req: Request, res: Response) => {
