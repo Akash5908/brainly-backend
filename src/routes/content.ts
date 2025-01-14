@@ -117,18 +117,26 @@ function generateToken(id: string) {
 }
 //Adding the token of the shared Card and send the url for the share
 routes.get("/share", async (req: Request, res: Response) => {
-  const cardToken = await generateToken(req.body.id);
+  const id = req.query.id;
+  if (!id) {
+    res.status(400).json({
+      message: "The id is not present",
+    });
+    return;
+  } else {
+    const cardToken = await generateToken(id as string);
 
-  const sharedLink = `http://localhost:3000/content/share/${cardToken}`;
+    const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
 
-  await CardLink.create({
-    token: cardToken,
-    userId: req.body.userId,
-  });
+    await CardLink.create({
+      token: cardToken,
+      userId: req.body.userId,
+    });
 
-  res.status(200).json({
-    message: sharedLink,
-  });
+    res.status(200).json({
+      url: sharedLink,
+    });
+  }
 });
 
 // Get the card info by the shared Link

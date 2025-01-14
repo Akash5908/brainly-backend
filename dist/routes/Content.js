@@ -115,15 +115,24 @@ function generateToken(id) {
 }
 //Adding the token of the shared Card and send the url for the share
 exports.routes.get("/share", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const cardToken = yield generateToken(req.body.id);
-    const sharedLink = `http://localhost:3000/content/share/${cardToken}`;
-    yield database_2.CardLink.create({
-        token: cardToken,
-        userId: req.body.userId,
-    });
-    res.status(200).json({
-        message: sharedLink,
-    });
+    const id = req.query.id;
+    if (!id) {
+        res.status(400).json({
+            message: "The id is not present",
+        });
+        return;
+    }
+    else {
+        const cardToken = yield generateToken(id);
+        const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
+        yield database_2.CardLink.create({
+            token: cardToken,
+            userId: req.body.userId,
+        });
+        res.status(200).json({
+            url: sharedLink,
+        });
+    }
 }));
 // Get the card info by the shared Link
 exports.routes.get("/share/:id", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
