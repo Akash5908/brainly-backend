@@ -110,31 +110,34 @@ exports.routes.delete("/", user_1.userStatus, (req, res) => __awaiter(void 0, vo
 }));
 //Share Link
 function generateToken(id) {
-    const token = jsonwebtoken_1.default.sign({ id }, "Secret", { expiresIn: "1h" });
-    return token;
+    const Cardtoken = jsonwebtoken_1.default.sign(id, "Secret");
+    return Cardtoken;
 }
-//Adding the token of the shared Card and send the url for the share
-exports.routes.get("/share", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.query.id;
-    if (!id) {
+//Adding the Cardtoken of the shared Card and send the url for the share
+exports.routes.post("/share", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { CardId, userId } = req.body;
+    if (!CardId) {
         res.status(400).json({
             message: "The id is not present",
         });
         return;
     }
     else {
-        const cardToken = yield generateToken(id);
-        const checkCardToken = yield database_2.CardLink.findOne({ token: cardToken });
+        const cardToken = yield generateToken(CardId);
+        const checkCardToken = yield database_2.CardLink.find({
+            Cardtoken: cardToken,
+            userId,
+        });
         if (checkCardToken) {
-            const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
+            const sharedLink = `http://localhost:3000/content/share?Cardtoken=${cardToken}`;
             res.status(200).json({
                 url: sharedLink,
             });
         }
         else {
-            const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
+            const sharedLink = `http://localhost:3000/content/share?Cardtoken=${cardToken}`;
             yield database_2.CardLink.create({
-                token: cardToken,
+                Cardtoken: cardToken,
                 userId: req.body.userId,
             });
             res.status(200).json({
@@ -144,33 +147,44 @@ exports.routes.get("/share", (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
 }));
 // Get the card info by the shared Link
-exports.routes.get("/share/:id", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    try {
-        const contentId = jsonwebtoken_1.default.verify(id, "Secret");
-        if (contentId) {
-            const Content = yield database_1.Contents.findById({ _id: contentId });
-            if (Content) {
-                res.status(200).json({
-                    content: Content,
-                });
+exports.routes.get("/share", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { Cardtoken } = req.query;
+    if (Cardtoken) {
+        try {
+            const decodedToken = jsonwebtoken_1.default.verify(Cardtoken, "Secret");
+            const contentId = typeof decodedToken === "string"
+                ? { id: decodedToken }
+                : decodedToken;
+            const cardId = contentId.id;
+            if (cardId) {
+                const Content = yield database_1.Contents.findById({ _id: cardId });
+                if (Content) {
+                    res.status(200).json({
+                        shareCardData: Content,
+                    });
+                }
+                else {
+                    res.status(403).json({
+                        message: `Content not found`,
+                    });
+                }
             }
             else {
                 res.status(403).json({
-                    message: `Content not found`,
+                    message: `Invalid Link`,
                 });
             }
         }
-        else {
-            res.status(403).json({
-                message: `Invalid Link`,
+        catch (error) {
+            res.status(500).json({
+                messae: "Somthing went wrong",
+                error: error,
             });
         }
     }
-    catch (error) {
-        res.status(500).json({
-            messae: "Somthing went wrong",
-            error: error,
+    else {
+        res.status(400).json({
+            error: "Invalid Url",
         });
     }
 }));

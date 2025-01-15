@@ -112,29 +112,35 @@ routes.delete("/", userStatus, async (req: Request, res: Response) => {
 //Share Link
 
 function generateToken(id: string) {
-  const token = jwt.sign({ id }, "Secret", { expiresIn: "1h" });
-  return token;
+  const Cardtoken = jwt.sign(id, "Secret");
+  return Cardtoken;
 }
-//Adding the token of the shared Card and send the url for the share
-routes.get("/share", async (req: Request, res: Response) => {
-  const id = req.query.id;
-  if (!id) {
+//Adding the Cardtoken of the shared Card and send the url for the share
+routes.post("/share", userStatus, async (req: Request, res: Response) => {
+  const { CardId, userId } = req.body;
+
+  if (!CardId) {
     res.status(400).json({
       message: "The id is not present",
     });
     return;
   } else {
-    const cardToken = await generateToken(id as string);
-    const checkCardToken = await CardLink.findOne({ token: cardToken });
+    const cardToken = await generateToken(CardId as string);
+    const checkCardToken = await CardLink.find({
+      Cardtoken: cardToken,
+      userId,
+    });
     if (checkCardToken) {
-      const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
+      const sharedLink = `http://localhost:3000/content/share?Cardtoken=${cardToken}`;
+
       res.status(200).json({
         url: sharedLink,
       });
     } else {
-      const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
+      const sharedLink = `http://localhost:3000/content/share?Cardtoken=${cardToken}`;
+
       await CardLink.create({
-        token: cardToken,
+        Cardtoken: cardToken,
         userId: req.body.userId,
       });
 
@@ -146,32 +152,42 @@ routes.get("/share", async (req: Request, res: Response) => {
 });
 
 // Get the card info by the shared Link
-routes.get("/share/:id", userStatus, async (req: Request, res: Response) => {
-  const id = req.params.id;
+routes.get("/share", async (req: Request, res: Response) => {
+  const { Cardtoken } = req.query;
 
-  try {
-    const contentId = jwt.verify(id, "Secret");
-    if (contentId) {
-      const Content = await Contents.findById({ _id: contentId });
-
-      if (Content) {
-        res.status(200).json({
-          content: Content,
-        });
+  if (Cardtoken) {
+    try {
+      const decodedToken = jwt.verify(Cardtoken as string, "Secret");
+      const contentId =
+        typeof decodedToken === "string"
+          ? { id: decodedToken }
+          : (decodedToken as { id: string });
+      const cardId = contentId.id;
+      if (cardId) {
+        const Content = await Contents.findById({ _id: cardId });
+        if (Content) {
+          res.status(200).json({
+            shareCardData: Content,
+          });
+        } else {
+          res.status(403).json({
+            message: `Content not found`,
+          });
+        }
       } else {
         res.status(403).json({
-          message: `Content not found`,
+          message: `Invalid Link`,
         });
       }
-    } else {
-      res.status(403).json({
-        message: `Invalid Link`,
+    } catch (error) {
+      res.status(500).json({
+        messae: "Somthing went wrong",
+        error: error,
       });
     }
-  } catch (error) {
-    res.status(500).json({
-      messae: "Somthing went wrong",
-      error: error,
+  } else {
+    res.status(400).json({
+      error: "Invalid Url",
     });
   }
 });
