@@ -124,14 +124,23 @@ exports.routes.get("/share", (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
     else {
         const cardToken = yield generateToken(id);
-        const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
-        yield database_2.CardLink.create({
-            token: cardToken,
-            userId: req.body.userId,
-        });
-        res.status(200).json({
-            url: sharedLink,
-        });
+        const checkCardToken = yield database_2.CardLink.findOne({ token: cardToken });
+        if (checkCardToken) {
+            const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
+            res.status(200).json({
+                url: sharedLink,
+            });
+        }
+        else {
+            const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
+            yield database_2.CardLink.create({
+                token: cardToken,
+                userId: req.body.userId,
+            });
+            res.status(200).json({
+                url: sharedLink,
+            });
+        }
     }
 }));
 // Get the card info by the shared Link

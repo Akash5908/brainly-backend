@@ -36,7 +36,7 @@ const ContentSchema = new Schema({
     userId: { type: mongoose_1.default.Types.ObjectId, ref: "users", required: true },
 });
 const LinkSchema = new Schema({
-    hash: String,
+    token: String,
     userId: { type: mongoose_1.default.Types.ObjectId, ref: "users" },
 });
 const CardLinkSchema = new Schema({

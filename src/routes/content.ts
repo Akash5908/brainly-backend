@@ -125,17 +125,23 @@ routes.get("/share", async (req: Request, res: Response) => {
     return;
   } else {
     const cardToken = await generateToken(id as string);
+    const checkCardToken = await CardLink.findOne({ token: cardToken });
+    if (checkCardToken) {
+      const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
+      res.status(200).json({
+        url: sharedLink,
+      });
+    } else {
+      const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
+      await CardLink.create({
+        token: cardToken,
+        userId: req.body.userId,
+      });
 
-    const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
-
-    await CardLink.create({
-      token: cardToken,
-      userId: req.body.userId,
-    });
-
-    res.status(200).json({
-      url: sharedLink,
-    });
+      res.status(200).json({
+        url: sharedLink,
+      });
+    }
   }
 });
 

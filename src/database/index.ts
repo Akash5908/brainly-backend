@@ -37,7 +37,7 @@ const ContentSchema = new Schema({
 });
 
 const LinkSchema = new Schema({
-  hash: String,
+  token: String,
   userId: { type: mongoose.Types.ObjectId, ref: "users" },
 });
 
