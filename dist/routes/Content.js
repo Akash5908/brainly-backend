@@ -188,3 +188,26 @@ exports.routes.get("/share", (req, res) => __awaiter(void 0, void 0, void 0, fun
         });
     }
 }));
+exports.routes.get("/search", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { search, userId } = req.query;
+    try {
+        const searchCards = yield database_1.Contents.find({
+            userId,
+            $or: [
+                { title: { $regex: search, $options: "i" } },
+                { describtion: { $regex: search, $options: "i" } },
+                {
+                    tags: { $regex: search, $options: "i" },
+                },
+            ],
+        });
+        res.status(200).json({
+            searchResult: searchCards,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            error: "Error while searching the data",
+        });
+    }
+}));

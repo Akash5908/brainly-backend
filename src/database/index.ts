@@ -13,7 +13,6 @@ const contenTypes = [
   "image",
   "video",
   "article",
-  "audio",
   "document",
   "tweet",
   "youtube",

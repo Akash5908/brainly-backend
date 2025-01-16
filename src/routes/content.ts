@@ -191,3 +191,27 @@ routes.get("/share", async (req: Request, res: Response) => {
     });
   }
 });
+
+routes.get("/search", userStatus, async (req: Request, res: Response) => {
+  const { search, userId } = req.query;
+
+  try {
+    const searchCards = await Contents.find({
+      userId,
+      $or: [
+        { title: { $regex: search, $options: "i" } },
+        { describtion: { $regex: search, $options: "i" } },
+        {
+          tags: { $regex: search, $options: "i" },
+        },
+      ],
+    });
+    res.status(200).json({
+      searchResult: searchCards,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Error while searching the data",
+    });
+  }
+});
