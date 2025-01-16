@@ -22,7 +22,7 @@ const contenTypes = [
     "link",
 ];
 const TagsSchema = new Schema({
-    title: String,
+    title: [String],
 });
 const ContentSchema = new Schema({
     link: String,

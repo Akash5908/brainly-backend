@@ -21,7 +21,7 @@ const contenTypes = [
 ];
 
 const TagsSchema = new Schema({
-  title: String,
+  title: [String],
 });
 
 const ContentSchema = new Schema({

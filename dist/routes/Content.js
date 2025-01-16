@@ -25,6 +25,18 @@ exports.routes.post("/", user_1.userStatus, (req, res) => __awaiter(void 0, void
     const { type, link, title, describtion, tags } = req.body.Carddata;
     const { userId } = req.body;
     try {
+        const tagsArray = yield database_1.Tags.findOne({ _id: "6787a53ba1f9e1c2a8852438" });
+        if (tagsArray === null) {
+            console.log("creating");
+            yield database_1.Tags.create({ userId, title: tags });
+        }
+        else {
+            console.log(tagsArray);
+            const prevArray = tagsArray.title;
+            prevArray.push(...tags); //modifing the value
+            tagsArray.title = prevArray; // Assigning back the value
+            yield tagsArray.save();
+        }
         yield database_1.Contents.create({
             type,
             link,
