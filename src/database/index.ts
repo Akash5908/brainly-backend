@@ -48,6 +48,7 @@ const CardLinkSchema = new Schema({
 });
 
 const ShareCards = new Schema({
+  id: String,
   link: String,
   type: String,
   title: String,

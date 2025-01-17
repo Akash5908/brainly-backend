@@ -45,6 +45,7 @@ const CardLinkSchema = new Schema({
     userId: { type: mongoose_1.default.Types.ObjectId, ref: "users" },
 });
 const ShareCards = new Schema({
+    id: String,
     link: String,
     type: String,
     title: String,

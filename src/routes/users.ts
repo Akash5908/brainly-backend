@@ -65,8 +65,7 @@ routes.post("/login", async (req: Request, res: Response) => {
 });
 
 routes.get("/share", userStatus, async (req: Request, res: Response) => {
-  const userId = req.params.id;
-
+  const userId = req.query.id;
   const userShareCards = await ShareCard.find({ userId });
   res.status(200).json({
     data: userShareCards,
