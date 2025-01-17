@@ -17,6 +17,7 @@ const express_1 = require("express");
 const zod_1 = require("zod");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const database_1 = require("../database");
+const user_1 = require("../middleware/user");
 exports.routes = (0, express_1.Router)();
 const userSchema = zod_1.z.object({
     username: zod_1.z
@@ -71,4 +72,11 @@ exports.routes.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, fu
             error: "Something went Wrong",
         });
     }
+}));
+exports.routes.get("/share", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.params.id;
+    const userShareCards = yield database_1.ShareCard.find({ userId });
+    res.status(200).json({
+        data: userShareCards,
+    });
 }));

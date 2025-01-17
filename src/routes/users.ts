@@ -3,7 +3,8 @@ import { z } from "zod";
 
 import jwt from "jsonwebtoken";
 
-import { Users } from "../database";
+import { ShareCard, Users } from "../database";
+import { userStatus } from "../middleware/user";
 
 export const routes = Router();
 
@@ -61,4 +62,13 @@ routes.post("/login", async (req: Request, res: Response) => {
       error: "Something went Wrong",
     });
   }
+});
+
+routes.get("/share", userStatus, async (req: Request, res: Response) => {
+  const userId = req.params.id;
+
+  const userShareCards = await ShareCard.find({ userId });
+  res.status(200).json({
+    data: userShareCards,
+  });
 });

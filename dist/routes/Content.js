@@ -16,7 +16,6 @@ exports.routes = void 0;
 const express_1 = require("express");
 const database_1 = require("../database");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const database_2 = require("../database");
 const user_1 = require("../middleware/user");
 exports.routes = (0, express_1.Router)();
 // Create the Content
@@ -149,67 +148,117 @@ exports.routes.delete("/", user_1.userStatus, (req, res) => __awaiter(void 0, vo
 }));
 //Share Link
 function generateToken(id) {
-    const token = jsonwebtoken_1.default.sign({ id }, "Secret", { expiresIn: "1h" });
-    return token;
+    const Cardtoken = jsonwebtoken_1.default.sign(id, "Secret");
+    return Cardtoken;
 }
-//Adding the token of the shared Card and send the url for the share
-exports.routes.get("/share", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.query.id;
-    if (!id) {
+//Adding the Cardtoken of the shared Card and send the url for the share
+exports.routes.post("/share", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { cardData } = req.body;
+    console.log("🚀 ~ routes.post ~ cardData:", cardData);
+    const cardId = cardData.id;
+    if (!cardData) {
         res.status(400).json({
             message: "The id is not present",
         });
         return;
     }
     else {
-        const cardToken = yield generateToken(id);
-        const checkCardToken = yield database_2.CardLink.findOne({ token: cardToken });
-        if (checkCardToken) {
-            const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
-            res.status(200).json({
-                url: sharedLink,
+        const cardToken = yield generateToken(cardId);
+        const { id, type, link, title, describtion, tags, userId } = cardData;
+        const cardCheck = yield database_1.ShareCard.findById(id);
+        if (!cardCheck) {
+            yield database_1.ShareCard.create({
+                id,
+                type,
+                link,
+                title,
+                describtion,
+                tags,
+                userId,
             });
         }
-        else {
-            const sharedLink = `http://localhost:3000/content/share?token=${cardToken}`;
-            yield database_2.CardLink.create({
-                token: cardToken,
-                userId: req.body.userId,
-            });
-            res.status(200).json({
-                url: sharedLink,
-            });
-        }
+        const sharedLink = `http://localhost:3000/content/share?Cardtoken=${cardToken}`;
+        res.status(200).json({
+            url: sharedLink,
+        });
     }
 }));
 // Get the card info by the shared Link
-exports.routes.get("/share/:id", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    try {
-        const contentId = jsonwebtoken_1.default.verify(id, "Secret");
-        if (contentId) {
-            const Content = yield database_1.Contents.findById({ _id: contentId });
-            if (Content) {
-                res.status(200).json({
-                    content: Content,
-                });
+exports.routes.get("/share", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { Cardtoken } = req.query;
+    if (Cardtoken) {
+        try {
+            const decodedToken = jsonwebtoken_1.default.verify(Cardtoken, "Secret");
+            const contentId = typeof decodedToken === "string"
+                ? { id: decodedToken }
+                : decodedToken;
+            const cardId = contentId.id;
+            if (cardId) {
+                const Content = yield database_1.Contents.findById({ _id: cardId });
+                if (Content) {
+                    res.status(200).json({
+                        shareCardData: Content,
+                    });
+                }
+                else {
+                    res.status(403).json({
+                        message: `Content not found`,
+                    });
+                }
             }
             else {
                 res.status(403).json({
-                    message: `Content not found`,
+                    message: `Invalid Link`,
                 });
             }
         }
-        else {
-            res.status(403).json({
-                message: `Invalid Link`,
+        catch (error) {
+            res.status(500).json({
+                messae: "Somthing went wrong",
+                error: error,
             });
         }
     }
+    else {
+        res.status(400).json({
+            error: "Invalid Url",
+        });
+    }
+}));
+exports.routes.get("/search", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { search, userId } = req.query;
+    try {
+        const searchCards = yield database_1.Contents.find({
+            userId,
+            $or: [
+                { title: { $regex: search, $options: "i" } },
+                { describtion: { $regex: search, $options: "i" } },
+                {
+                    tags: { $regex: search, $options: "i" },
+                },
+            ],
+        });
+        res.status(200).json({
+            searchResult: searchCards,
+        });
+    }
     catch (error) {
         res.status(500).json({
-            messae: "Somthing went wrong",
-            error: error,
+            error: "Error while searching the data",
+        });
+    }
+}));
+exports.routes.delete("/share", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id, userId } = req.body;
+    try {
+        yield database_1.ShareCard.deleteOne({ _id: id, userId });
+        res.status(200).json({
+            message: "Card delete form Share Successfull",
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            error: "Error in updating the Delete",
         });
     }
 }));
