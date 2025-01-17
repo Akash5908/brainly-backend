@@ -20,8 +20,13 @@ routes.post("/", userStatus, async (req: Request, res: Response) => {
       await Tags.create({ userId, title: tags });
     } else {
       console.log(tagsArray);
+      let uniqueTags = [];
       const prevArray = tagsArray.title;
-      prevArray.push(...tags); //modifing the value
+      {
+        uniqueTags = tags.filter((tags: string) => !prevArray.includes(tags));
+      }
+      console.log(uniqueTags);
+      prevArray.push(...uniqueTags); //modifing the value
       tagsArray.title = prevArray; // Assigning back the value
       await tagsArray.save();
     }
@@ -51,6 +56,28 @@ routes.get("/", userStatus, async (req: Request, res: Response) => {
 
   try {
     const contentCheck = await Contents.find({ userId });
+
+    if (contentCheck.length > 0) {
+      res.status(200).json({
+        content: contentCheck,
+      });
+    } else {
+      res.status(403).json({
+        message: "User do not have any Content to see",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      error: error,
+    });
+  }
+});
+
+// Get all the tags
+routes.get("/tags", async (req: Request, res: Response) => {
+  const userId = "6787a53ba1f9e1c2a8852438";
+  try {
+    const contentCheck = await Tags.find({ _id: userId });
 
     if (contentCheck.length > 0) {
       res.status(200).json({

@@ -32,8 +32,13 @@ exports.routes.post("/", user_1.userStatus, (req, res) => __awaiter(void 0, void
         }
         else {
             console.log(tagsArray);
+            let uniqueTags = [];
             const prevArray = tagsArray.title;
-            prevArray.push(...tags); //modifing the value
+            {
+                uniqueTags = tags.filter((tags) => !prevArray.includes(tags));
+            }
+            console.log(uniqueTags);
+            prevArray.push(...uniqueTags); //modifing the value
             tagsArray.title = prevArray; // Assigning back the value
             yield tagsArray.save();
         }
@@ -60,6 +65,28 @@ exports.routes.get("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 
     const userId = req.query.id;
     try {
         const contentCheck = yield database_1.Contents.find({ userId });
+        if (contentCheck.length > 0) {
+            res.status(200).json({
+                content: contentCheck,
+            });
+        }
+        else {
+            res.status(403).json({
+                message: "User do not have any Content to see",
+            });
+        }
+    }
+    catch (error) {
+        res.status(500).json({
+            error: error,
+        });
+    }
+}));
+// Get all the tags
+exports.routes.get("/tags", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = "6787a53ba1f9e1c2a8852438";
+    try {
+        const contentCheck = yield database_1.Tags.find({ _id: userId });
         if (contentCheck.length > 0) {
             res.status(200).json({
                 content: contentCheck,
