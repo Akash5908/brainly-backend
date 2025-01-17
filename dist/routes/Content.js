@@ -22,6 +22,7 @@ exports.routes = (0, express_1.Router)();
 exports.routes.post("/", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("REQUEST BODY ADD CONTENT", req.body);
     const { type, link, title, describtion, tags } = req.body.Carddata;
+    const createdDate = new Date().toISOString().split("T")[0];
     const { userId } = req.body;
     try {
         const tagsArray = yield database_1.Tags.findOne({ _id: "6787a53ba1f9e1c2a8852438" });
@@ -45,6 +46,7 @@ exports.routes.post("/", user_1.userStatus, (req, res) => __awaiter(void 0, void
             type,
             link,
             title,
+            createdDate,
             describtion,
             tags,
             userId,
