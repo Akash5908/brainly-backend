@@ -125,15 +125,19 @@ exports.routes.post("/share", user_1.userStatus, (req, res) => __awaiter(void 0,
     }
     else {
         const cardToken = yield generateToken(cardId);
-        const { type, link, title, describtion, tags, userId } = cardData;
-        yield database_1.ShareCard.create({
-            type,
-            link,
-            title,
-            describtion,
-            tags,
-            userId,
-        });
+        const { id, type, link, title, describtion, tags, userId } = cardData;
+        const cardCheck = yield database_1.ShareCard.findById(id);
+        if (!cardCheck) {
+            yield database_1.ShareCard.create({
+                id,
+                type,
+                link,
+                title,
+                describtion,
+                tags,
+                userId,
+            });
+        }
         const sharedLink = `http://localhost:3000/content/share?Cardtoken=${cardToken}`;
         res.status(200).json({
             url: sharedLink,
@@ -202,6 +206,20 @@ exports.routes.get("/search", user_1.userStatus, (req, res) => __awaiter(void 0,
     catch (error) {
         res.status(500).json({
             error: "Error while searching the data",
+        });
+    }
+}));
+exports.routes.delete("/share", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id, userId } = req.body;
+    try {
+        yield database_1.ShareCard.deleteOne({ _id: id, userId });
+        res.status(200).json({
+            message: "Card delete form Share Successfull",
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            error: "Error in updating the Delete",
         });
     }
 }));
