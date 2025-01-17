@@ -157,11 +157,12 @@ function generateToken(id: string) {
   const Cardtoken = jwt.sign(id, "Secret");
   return Cardtoken;
 }
-//Adding the Cardtoken of the shared Card and send the url for the share
+
 routes.post("/share", userStatus, async (req: Request, res: Response) => {
   const { cardData } = req.body;
   console.log("🚀 ~ routes.post ~ cardData:", cardData);
   const cardId = cardData.id;
+  console.log("🚀 ~ routes.post ~ cardId:", cardId);
   if (!cardData) {
     res.status(400).json({
       message: "The id is not present",
@@ -193,7 +194,6 @@ routes.post("/share", userStatus, async (req: Request, res: Response) => {
 // Get the card info by the shared Link
 routes.get("/share", async (req: Request, res: Response) => {
   const { Cardtoken } = req.query;
-
   if (Cardtoken) {
     try {
       const decodedToken = jwt.verify(Cardtoken as string, "Secret");
@@ -203,7 +203,8 @@ routes.get("/share", async (req: Request, res: Response) => {
           : (decodedToken as { id: string });
       const cardId = contentId.id;
       if (cardId) {
-        const Content = await Contents.findById({ _id: cardId });
+        const Content = await ShareCard.find({ id: cardId });
+
         if (Content) {
           res.status(200).json({
             shareCardData: Content,
@@ -256,7 +257,8 @@ routes.get("/search", userStatus, async (req: Request, res: Response) => {
 });
 
 routes.delete("/share", userStatus, async (req: Request, res: Response) => {
-  const { id, userId } = req.body;
+  const { id, userId } = req.query;
+
   try {
     await ShareCard.deleteOne({ _id: id, userId });
     res.status(200).json({

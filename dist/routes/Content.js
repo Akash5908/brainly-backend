@@ -151,11 +151,11 @@ function generateToken(id) {
     const Cardtoken = jsonwebtoken_1.default.sign(id, "Secret");
     return Cardtoken;
 }
-//Adding the Cardtoken of the shared Card and send the url for the share
 exports.routes.post("/share", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { cardData } = req.body;
     console.log("🚀 ~ routes.post ~ cardData:", cardData);
     const cardId = cardData.id;
+    console.log("🚀 ~ routes.post ~ cardId:", cardId);
     if (!cardData) {
         res.status(400).json({
             message: "The id is not present",
@@ -194,7 +194,7 @@ exports.routes.get("/share", (req, res) => __awaiter(void 0, void 0, void 0, fun
                 : decodedToken;
             const cardId = contentId.id;
             if (cardId) {
-                const Content = yield database_1.Contents.findById({ _id: cardId });
+                const Content = yield database_1.ShareCard.find({ id: cardId });
                 if (Content) {
                     res.status(200).json({
                         shareCardData: Content,
@@ -249,7 +249,7 @@ exports.routes.get("/search", user_1.userStatus, (req, res) => __awaiter(void 0,
     }
 }));
 exports.routes.delete("/share", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id, userId } = req.body;
+    const { id, userId } = req.query;
     try {
         yield database_1.ShareCard.deleteOne({ _id: id, userId });
         res.status(200).json({
