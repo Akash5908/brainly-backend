@@ -74,7 +74,7 @@ exports.routes.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
 }));
 exports.routes.get("/share", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.params.id;
+    const userId = req.query.id;
     const userShareCards = yield database_1.ShareCard.find({ userId });
     res.status(200).json({
         data: userShareCards,
