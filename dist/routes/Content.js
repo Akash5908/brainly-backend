@@ -16,7 +16,6 @@ exports.routes = void 0;
 const express_1 = require("express");
 const database_1 = require("../database");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const database_2 = require("../database");
 const user_1 = require("../middleware/user");
 exports.routes = (0, express_1.Router)();
 // Create the Content
@@ -115,35 +114,30 @@ function generateToken(id) {
 }
 //Adding the Cardtoken of the shared Card and send the url for the share
 exports.routes.post("/share", user_1.userStatus, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { CardId, userId } = req.body;
-    if (!CardId) {
+    const { cardData } = req.body;
+    console.log("🚀 ~ routes.post ~ cardData:", cardData);
+    const cardId = cardData.id;
+    if (!cardData) {
         res.status(400).json({
             message: "The id is not present",
         });
         return;
     }
     else {
-        const cardToken = yield generateToken(CardId);
-        const checkCardToken = yield database_2.CardLink.find({
-            Cardtoken: cardToken,
+        const cardToken = yield generateToken(cardId);
+        const { type, link, title, describtion, tags, userId } = cardData;
+        yield database_1.ShareCard.create({
+            type,
+            link,
+            title,
+            describtion,
+            tags,
             userId,
         });
-        if (checkCardToken) {
-            const sharedLink = `http://localhost:3000/content/share?Cardtoken=${cardToken}`;
-            res.status(200).json({
-                url: sharedLink,
-            });
-        }
-        else {
-            const sharedLink = `http://localhost:3000/content/share?Cardtoken=${cardToken}`;
-            yield database_2.CardLink.create({
-                Cardtoken: cardToken,
-                userId: req.body.userId,
-            });
-            res.status(200).json({
-                url: sharedLink,
-            });
-        }
+        const sharedLink = `http://localhost:3000/content/share?Cardtoken=${cardToken}`;
+        res.status(200).json({
+            url: sharedLink,
+        });
     }
 }));
 // Get the card info by the shared Link

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 
-import { Contents } from "../database";
+import { Contents, ShareCard } from "../database";
 import jwt from "jsonwebtoken";
 
 import { CardLink } from "../database";
@@ -117,37 +117,30 @@ function generateToken(id: string) {
 }
 //Adding the Cardtoken of the shared Card and send the url for the share
 routes.post("/share", userStatus, async (req: Request, res: Response) => {
-  const { CardId, userId } = req.body;
-
-  if (!CardId) {
+  const { cardData } = req.body;
+  console.log("🚀 ~ routes.post ~ cardData:", cardData);
+  const cardId = cardData.id;
+  if (!cardData) {
     res.status(400).json({
       message: "The id is not present",
     });
     return;
   } else {
-    const cardToken = await generateToken(CardId as string);
-    const checkCardToken = await CardLink.find({
-      Cardtoken: cardToken,
+    const cardToken = await generateToken(cardId as string);
+    const { type, link, title, describtion, tags, userId } = cardData;
+    await ShareCard.create({
+      type,
+      link,
+      title,
+      describtion,
+      tags,
       userId,
     });
-    if (checkCardToken) {
-      const sharedLink = `http://localhost:3000/content/share?Cardtoken=${cardToken}`;
+    const sharedLink = `http://localhost:3000/content/share?Cardtoken=${cardToken}`;
 
-      res.status(200).json({
-        url: sharedLink,
-      });
-    } else {
-      const sharedLink = `http://localhost:3000/content/share?Cardtoken=${cardToken}`;
-
-      await CardLink.create({
-        Cardtoken: cardToken,
-        userId: req.body.userId,
-      });
-
-      res.status(200).json({
-        url: sharedLink,
-      });
-    }
+    res.status(200).json({
+      url: sharedLink,
+    });
   }
 });
 

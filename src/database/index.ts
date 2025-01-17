@@ -20,7 +20,7 @@ const contenTypes = [
 ];
 
 const TagsSchema = new Schema({
-  title: String,
+  title: [String],
 });
 
 const ContentSchema = new Schema({
@@ -30,7 +30,7 @@ const ContentSchema = new Schema({
   describtion: {
     type: String,
   },
-  // tags: [{ type: mongoose.Types.ObjectId, ref: "tags" }],
+
   tags: [String],
   userId: { type: mongoose.Types.ObjectId, ref: "users", required: true },
 });
@@ -45,8 +45,18 @@ const CardLinkSchema = new Schema({
   userId: { type: mongoose.Types.ObjectId, ref: "users" },
 });
 
+const ShareCards = new Schema({
+  link: String,
+  type: String,
+  title: String,
+  describtion: String,
+  tags: [String],
+  userId: { type: mongoose.Types.ObjectId, ref: "users" },
+});
+
 export const Users = mongoose.model("users", UserSchema);
 export const Tags = mongoose.model("tags", TagsSchema);
 export const Contents = mongoose.model("contents", ContentSchema);
 export const Links = mongoose.model("links", LinkSchema);
 export const CardLink = mongoose.model("cardLinks", CardLinkSchema);
+export const ShareCard = mongoose.model("shareCards", ShareCards);
