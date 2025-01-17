@@ -1,8 +1,6 @@
 import { Router, Request, Response } from "express";
 
-
-import { Contents, Tags , ShareCard} from "../database";
-
+import { Contents, Tags, ShareCard } from "../database";
 
 import jwt from "jsonwebtoken";
 
@@ -15,6 +13,7 @@ export const routes = Router();
 routes.post("/", userStatus, async (req: Request, res: Response) => {
   console.log("REQUEST BODY ADD CONTENT", req.body);
   const { type, link, title, describtion, tags } = req.body.Carddata;
+  const createdDate = new Date().toISOString().split("T")[0];
   const { userId } = req.body;
   try {
     const tagsArray = await Tags.findOne({ _id: "6787a53ba1f9e1c2a8852438" });
@@ -38,6 +37,7 @@ routes.post("/", userStatus, async (req: Request, res: Response) => {
       type,
       link,
       title,
+      createdDate,
       describtion,
       tags,
       userId,
