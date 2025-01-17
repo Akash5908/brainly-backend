@@ -30,6 +30,9 @@ const ContentSchema = new Schema({
     describtion: {
         type: String,
     },
+    createdDate: {
+        type: String,
+    },
     tags: [String],
     userId: { type: mongoose_1.default.Types.ObjectId, ref: "users", required: true },
 });
